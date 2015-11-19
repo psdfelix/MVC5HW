@@ -1,4 +1,4 @@
-﻿@model IEnumerable<作業客戶管理.Models.客戶資料>
+﻿@model 作業客戶管理.Models.ViewModel.客戶資料SearchViewModel
 
 @{
     ViewBag.Title = "Index";
@@ -12,34 +12,35 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    @Html.TextBox("search")
-    <input type="submit" name="submit" value="搜尋" class="text-right" />
+    <div class="row">
+        <div class="col-lg-4">
+            <label>客戶名稱：</label>
+            @Html.EditorFor(a => a.Search)
+        </div>
+        <div class="col-lg-4">
+            <label>客戶分類：</label>
+            @Html.EnumDropDownListFor(a => a.客戶分類, "全部")
+        </div>
+        <input type="submit" name="submit" value="搜尋" class="text-right" />
+    </div>
 }
 <table class="table">
     <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.客戶名稱)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.統一編號)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.電話)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.傳真)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.地址)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Email)
-        </th>
-        <th></th>
+        <th>客戶分類</th>
+        <th>客戶名稱</th>
+        <th>統一編號</th>
+        <th>電話</th>
+        <th>傳真</th>
+        <th>地址</th>
+        <th>Email</th>
+        <th>功能列表</th>
     </tr>
 
-@foreach (var item in Model) {
+@foreach (var item in Model.客戶資料列表) {
     <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.客戶分類)
+        </td>
         <td>
             @Html.DisplayFor(modelItem => item.客戶名稱)
         </td>
@@ -65,5 +66,4 @@
         </td>
     </tr>
 }
-
 </table>

@@ -32,9 +32,13 @@ namespace 作業客戶管理.Models
         [StringLength(100, ErrorMessage="欄位長度不得大於 100 個字元")]
         public string 地址 { get; set; }
         
+        //[RegularExpression(@"\d{4}-\d{6}")]
         [StringLength(250, ErrorMessage="欄位長度不得大於 250 個字元")]
         public string Email { get; set; }
-    
+
+        public bool? IsDelete { get; set; }
+        public int? 客戶分類 { get; set; }
+
         public virtual ICollection<客戶銀行資訊> 客戶銀行資訊 { get; set; }
         public virtual ICollection<客戶聯絡人> 客戶聯絡人 { get; set; }
     }

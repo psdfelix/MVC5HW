@@ -7,25 +7,33 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using 作業客戶管理.Models;
+using 作業客戶管理.Models.ViewModel.客戶銀行資訊VM;
 
 namespace 作業客戶管理.Controllers
 {
     public class 客戶銀行資訊Controller : Controller
     {
         private 客戶資料Entities db = new 客戶資料Entities();
+        private readonly 客戶銀行資訊Repository 客戶銀行資訊Repository;
+
+        public 客戶銀行資訊Controller()
+        {
+            this.客戶銀行資訊Repository = RepositoryHelper.Get客戶銀行資訊Repository();
+        }
 
         // GET: 客戶銀行資訊
         public ActionResult Index()
         {
-            var 客戶銀行資訊 = db.客戶銀行資訊.Include(客 => 客.客戶資料);
-            var data = db.客戶銀行資訊.Where(p => p.IsDelete != true).ToList();
-            return View(data);
+            var data = 客戶銀行資訊Repository.All().Where(p => p.IsDelete != true).ToList();
+            客戶銀行資訊SearchViewModel 客戶銀行資訊SVM = new 客戶銀行資訊SearchViewModel();
+            客戶銀行資訊SVM.客戶銀行資訊列表 = data;
+            return View(客戶銀行資訊SVM);
         }
 
         [HttpPost]
-        public ActionResult Index(string search)
+        public ActionResult Index(客戶銀行資訊SearchViewModel 客戶銀行資訊SVM)
         {
-            var data = db.客戶銀行資訊.Where(p => p.銀行名稱.Contains(search));
+            var data = 客戶銀行資訊Repository.SearchList(客戶銀行資訊SVM);
             return View(data);
         }
 
@@ -36,7 +44,7 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = 客戶銀行資訊Repository.GetDataById(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -56,17 +64,16 @@ namespace 作業客戶管理.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,客戶Id,銀行名稱,銀行代碼,分行代碼,帳戶名稱,帳戶號碼")] 客戶銀行資訊 客戶銀行資訊)
+        public ActionResult Create(客戶銀行資訊CreateViewModel 客戶銀行資訊CVM)
         {
             if (ModelState.IsValid)
             {
-                db.客戶銀行資訊.Add(客戶銀行資訊);
-                db.SaveChanges();
+                客戶銀行資訊Repository.Create(客戶銀行資訊CVM);
                 return RedirectToAction("Index");
             }
 
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
-            return View(客戶銀行資訊);
+            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊CVM.客戶Id);
+            return View(客戶銀行資訊CVM);
         }
 
         // GET: 客戶銀行資訊/Edit/5
@@ -76,7 +83,7 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = 客戶銀行資訊Repository.GetDataById(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -92,11 +99,14 @@ namespace 作業客戶管理.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,客戶Id,銀行名稱,銀行代碼,分行代碼,帳戶名稱,帳戶號碼")] 客戶銀行資訊 客戶銀行資訊)
         {
+            var data = 客戶銀行資訊Repository.GetDataById(客戶銀行資訊.Id);
             if (ModelState.IsValid)
             {
-                db.Entry(客戶銀行資訊).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (TryUpdateModel<客戶銀行資訊>(data))
+                {
+                    客戶銀行資訊Repository.UnitOfWork.Commit();
+                    return RedirectToAction("Index");
+                }
             }
             ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
             return View(客戶銀行資訊);
@@ -109,7 +119,7 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = 客戶銀行資訊Repository.GetDataById(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -122,9 +132,9 @@ namespace 作業客戶管理.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = 客戶銀行資訊Repository.GetDataById(id);
             客戶銀行資訊.IsDelete = true;
-            db.SaveChanges();
+            客戶銀行資訊Repository.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
@@ -132,7 +142,7 @@ namespace 作業客戶管理.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                客戶銀行資訊Repository.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
         }

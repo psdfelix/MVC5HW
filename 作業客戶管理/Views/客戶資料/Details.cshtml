@@ -5,61 +5,98 @@
 }
 
 <h2>Details</h2>
+@using (Html.BeginForm("EditList2", "客戶聯絡人", FormMethod.Post, new { id = Model.Id }))
+{
+    @Html.HiddenFor(a => a.Id)
+    <div>
+        <h4>客戶資料</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.客戶名稱)
+            </dt>
 
-<div>
-    <h4>客戶資料</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.客戶名稱)
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.客戶名稱)
+            </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.客戶名稱)
-        </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.統一編號)
+            </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.統一編號)
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.統一編號)
+            </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.統一編號)
-        </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.電話)
+            </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.電話)
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.電話)
+            </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.電話)
-        </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.傳真)
+            </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.傳真)
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.傳真)
+            </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.傳真)
-        </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.地址)
+            </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.地址)
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.地址)
+            </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.地址)
-        </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Email)
+            </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Email)
+            </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.Email)
-        </dd>
+            <dt>
+                聯絡人資料
+            </dt>
+            <dd>
+                <table>
+                    <tr>
+                        <td class="col-md-1">職稱</td>
+                        <td class="col-md-2">姓名</td>
+                        <td class="col-md-3">手機</td>
+                        <td class="col-md-3">電話</td>
+                        <td class="col-md-3">Email</td>
+                    </tr>
+                    @{
+                        var data = Model.客戶聯絡人.ToArray();
+                    }
 
-    </dl>
-</div>
+                    @for (int i = 0; i < data.Length; i++)
+                    {
+                        <tr>
+                            <td>
+                                @Html.HiddenFor(modelItem => data[i].Id)
+                                @Html.HiddenFor(modelItem => data[i].客戶Id)
+                                @Html.EditorFor(a => data[i].職稱)
+                            </td>
+                            <td>@data[i].姓名</td>
+                            <td>@Html.EditorFor(a => data[i].手機)</td>
+                            <td>@Html.EditorFor(a => data[i].電話)</td>
+                            <td>@data[i].Email</td>
+                        </tr>
+                    }
+                </table>
+                <button type="submit" value="批次更新">批次更新</button>
+            </dd>
+        </dl>
+    </div>
+}
+
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")

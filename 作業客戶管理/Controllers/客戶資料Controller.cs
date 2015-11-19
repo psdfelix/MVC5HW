@@ -1,30 +1,36 @@
-﻿using System;
+﻿using AutoMapper;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using 作業客戶管理.Models;
+using 作業客戶管理.Models.ViewModel;
 
 namespace 作業客戶管理.Controllers
 {
     public class 客戶資料Controller : Controller
     {
-        private 客戶資料Entities db = new 客戶資料Entities();
+        private readonly 客戶資料Repository customerData;
+
+        public 客戶資料Controller()
+        {
+            this.customerData = RepositoryHelper.Get客戶資料Repository();
+        }
 
         // GET: 客戶資料
         public ActionResult Index()
         {
-            var data = db.客戶資料.Where(p => p.IsDelete != true).ToList();
-            return View(data);
+            var data = customerData.All().Where(p => p.IsDelete != true).ToList();
+            客戶資料SearchViewModel result = new 客戶資料SearchViewModel();
+            result.客戶資料列表 = data;
+            return View(result);
         }
 
         [HttpPost]
-        public ActionResult Index(string search)
+        public ActionResult Index(客戶資料SearchViewModel 客戶資料VM)
         {
-            var data = db.客戶資料.Where(p => p.客戶名稱.Contains(search));
+            var data = customerData.SearchList(客戶資料VM);
             return View(data);
         }
 
@@ -35,7 +41,8 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+
+            客戶資料 客戶資料 = customerData.GetDataById(id.Value);
             if (客戶資料 == null)
             {
                 return HttpNotFound();
@@ -54,16 +61,15 @@ namespace 作業客戶管理.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
+        public ActionResult Create(客戶資料CreateViewModel 客戶資料CVM)
         {
             if (ModelState.IsValid)
             {
-                db.客戶資料.Add(客戶資料);
-                db.SaveChanges();
+                customerData.Create(客戶資料CVM);
                 return RedirectToAction("Index");
             }
 
-            return View(客戶資料);
+            return View(客戶資料CVM);
         }
 
         // GET: 客戶資料/Edit/5
@@ -73,12 +79,14 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = customerData.GetDataById(id.Value);
+            Mapper.CreateMap<客戶資料,客戶資料CreateViewModel >();
+            客戶資料CreateViewModel 客戶資料EVM = Mapper.Map<客戶資料CreateViewModel>(客戶資料);
             if (客戶資料 == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            return View(客戶資料EVM);
         }
 
         // POST: 客戶資料/Edit/5
@@ -88,12 +96,13 @@ namespace 作業客戶管理.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
         {
-            if (ModelState.IsValid)
+            var data = customerData.GetDataById(客戶資料.Id);
+            if (TryUpdateModel<客戶資料>(data))
             {
-                db.Entry(客戶資料).State = EntityState.Modified;
-                db.SaveChanges();
+                customerData.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
+
             return View(客戶資料);
         }
 
@@ -104,7 +113,7 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = customerData.GetDataById(id.Value);
             if (客戶資料 == null)
             {
                 return HttpNotFound();
@@ -117,9 +126,9 @@ namespace 作業客戶管理.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = customerData.GetDataById(id);
             客戶資料.IsDelete = true;
-            db.SaveChanges();
+            customerData.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
@@ -127,7 +136,7 @@ namespace 作業客戶管理.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                customerData.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
         }

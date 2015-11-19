@@ -1,31 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using 作業客戶管理.Models;
+using 作業客戶管理.Models.ViewModel.客戶聯絡人VM;
 
 namespace 作業客戶管理.Controllers
 {
     public class 客戶聯絡人Controller : Controller
     {
         private 客戶資料Entities db = new 客戶資料Entities();
+        private readonly 客戶聯絡人Repository 客戶聯絡人Repository;
+
+        public 客戶聯絡人Controller()
+        {
+            this.客戶聯絡人Repository = RepositoryHelper.Get客戶聯絡人Repository();
+        }
 
         // GET: 客戶聯絡人
         public ActionResult Index()
         {
-            var 客戶聯絡人 = db.客戶聯絡人.Include(客 => 客.客戶資料);
-            var data = db.客戶聯絡人.Where(p => p.IsDelete != true).ToList();
-            return View(data);
+            var data = 客戶聯絡人Repository.All().Where(p => p.IsDelete != true).ToList();
+            客戶聯絡人SearchViewModel 客戶聯絡人SVM = new 客戶聯絡人SearchViewModel();
+            客戶聯絡人SVM.客戶聯絡人列表 = data;
+            return View(客戶聯絡人SVM);
         }
 
         [HttpPost]
-        public ActionResult Index(string search)
+        public ActionResult Index(客戶聯絡人SearchViewModel 客戶聯絡人SVM)
         {
-            var data = db.客戶聯絡人.Where(p => p.姓名.Contains(search));
+            var data = 客戶聯絡人Repository.SearchList(客戶聯絡人SVM);
             return View(data);
         }
 
@@ -36,7 +42,7 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
+            客戶聯絡人 客戶聯絡人 = 客戶聯絡人Repository.GetDataById(id.Value);
             if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
@@ -56,24 +62,23 @@ namespace 作業客戶管理.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(客戶聯絡人 客戶聯絡人)
+        public ActionResult Create(客戶聯絡人CreateViewModel 客戶聯絡人CVM)
         {
-            var hasEmail = db.客戶聯絡人.Where(p => p.Email == 客戶聯絡人.Email && p.客戶Id == 客戶聯絡人.客戶Id).Any();
+            var hasEmail = 客戶聯絡人Repository.All().Where(p => p.Email == 客戶聯絡人CVM.Email && p.客戶Id == 客戶聯絡人CVM.客戶Id).Any();
             if (hasEmail)
             {
                 ModelState.AddModelError("Email", "E-mail不可重複");
             }
-        
+
 
             if (ModelState.IsValid)
             {
-                db.客戶聯絡人.Add(客戶聯絡人);
-                db.SaveChanges();
+                客戶聯絡人Repository.Create(客戶聯絡人CVM);
                 return RedirectToAction("Index");
             }
 
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
-            return View(客戶聯絡人);
+            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人CVM.客戶Id);
+            return View(客戶聯絡人CVM);
         }
 
         // GET: 客戶聯絡人/Edit/5
@@ -83,7 +88,7 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
+            客戶聯絡人 客戶聯絡人 = 客戶聯絡人Repository.GetDataById(id.Value);
             if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
@@ -99,12 +104,19 @@ namespace 作業客戶管理.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 客戶聯絡人)
         {
-            if (ModelState.IsValid)
+            var hasEmail = 客戶聯絡人Repository.All().Where(p => p.Email == 客戶聯絡人.Email && p.Id != 客戶聯絡人.Id).Any();
+            if (hasEmail)
             {
-                db.Entry(客戶聯絡人).State = EntityState.Modified;
-                db.SaveChanges();
+                ModelState.AddModelError("Email", "E-mail不可重複");
+            }
+
+            var data = 客戶聯絡人Repository.GetDataById(客戶聯絡人.Id);
+            if (TryUpdateModel<客戶聯絡人>(data))
+            {
+                客戶聯絡人Repository.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
+
             ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
             return View(客戶聯絡人);
         }
@@ -116,7 +128,7 @@ namespace 作業客戶管理.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
+            客戶聯絡人 客戶聯絡人 = 客戶聯絡人Repository.GetDataById(id.Value);
             if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
@@ -129,7 +141,7 @@ namespace 作業客戶管理.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
+            客戶聯絡人 客戶聯絡人 = 客戶聯絡人Repository.GetDataById(id);
             客戶聯絡人.IsDelete = true;
             db.SaveChanges();
             return RedirectToAction("Index");
@@ -139,9 +151,25 @@ namespace 作業客戶管理.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                客戶聯絡人Repository.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult EditList()
+        {
+            List<客戶聯絡人ListEditViewModel> customerList = new List<客戶聯絡人ListEditViewModel>();
+            TryUpdateModel<IList<客戶聯絡人ListEditViewModel>>(customerList, "CS$<>8__locals1.data");
+            客戶聯絡人Repository.EditList(customerList);
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult EditList2(int id)
+        {
+            List<客戶聯絡人ListEditViewModel> customerList = new List<客戶聯絡人ListEditViewModel>();
+            TryUpdateModel<IList<客戶聯絡人ListEditViewModel>>(customerList, "CS$<>8__locals1.data");
+            客戶聯絡人Repository.EditList(customerList);
+            return RedirectToAction("Details", "客戶資料", new { id = id });
         }
     }
 }
