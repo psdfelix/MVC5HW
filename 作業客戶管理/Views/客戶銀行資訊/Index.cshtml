@@ -5,20 +5,33 @@
 }
 
 <h2>Index</h2>
-
+@section breadcrumb{
+    <li>客戶銀行資訊</li>
+}
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
 @using (Html.BeginForm())
 {
-    <div class="row">
-        <div class="col-lg-4">
-            <label>銀行名稱：</label>
-            @Html.EditorFor(p => p.BankName)
+    @*<table>
+            <tr>
+                <td>
+                    <label>銀行名稱：</label>
+                    @Html.EditorFor(p => p.BankName)
+                    <input type="submit" name="submit" value="搜尋" class="text-right" />
+                    <a href="@Url.Action("ExcelFile", "客戶銀行資訊")" role="button" class="btn btn-group-sm">匯出成Excel</a>
+                </td>
+            </tr>
+        </table>*@
+    <div class="container">
+        <div class="row-fluid">
+                <div class="col-md-5">
+                    銀行名稱：@Html.EditorFor(p => p.BankName)
+                </div>
+                    <input type="submit" name="submit" value="搜尋" class="text-right" />
+                    <a href="@Url.Action("ExcelFile", "客戶銀行資訊")" role="button" class="btn btn-group-sm">匯出成Excel</a>
+            </div>
         </div>
-        <input type="submit" name="submit" value="搜尋" class="text-right" />
-        <a href="@Url.Action("ExcelFile", "客戶銀行資訊")" role="button" class="btn btn-group-sm">匯出成Excel</a>
-    </div>
 }
 <table class="table">
     <tr>
