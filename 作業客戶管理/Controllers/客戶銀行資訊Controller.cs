@@ -1,7 +1,10 @@
-﻿using System;
+﻿using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -145,6 +148,36 @@ namespace 作業客戶管理.Controllers
                 客戶銀行資訊Repository.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult ExcelFile()
+        {
+            IWorkbook wb = new XSSFWorkbook();
+            ISheet ws;
+            ws = wb.CreateSheet("客戶銀行資料表");
+            var data = 客戶銀行資訊Repository.All().Where(p => p.IsDelete != true).ToList();
+            var dataarray = data.ToArray();
+
+            ws.CreateRow(0).CreateCell(0).SetCellValue("銀行名稱");
+            ws.GetRow(0).CreateCell(1).SetCellValue("銀行代碼");
+            ws.GetRow(0).CreateCell(2).SetCellValue("分行代碼");
+            ws.GetRow(0).CreateCell(3).SetCellValue("帳戶名稱");
+            ws.GetRow(0).CreateCell(4).SetCellValue("帳戶號碼");
+            ws.GetRow(0).CreateCell(5).SetCellValue("客戶名稱");
+
+            for (int i = 1; i <= dataarray.Length; i++)
+            {
+                ws.CreateRow(i).CreateCell(0).SetCellValue(dataarray[i - 1].銀行名稱);
+                ws.GetRow(i).CreateCell(1).SetCellValue(dataarray[i - 1].銀行代碼);
+                ws.GetRow(i).CreateCell(2).SetCellValue(dataarray[i - 1].分行代碼.Value);
+                ws.GetRow(i).CreateCell(3).SetCellValue(dataarray[i - 1].帳戶名稱);
+                ws.GetRow(i).CreateCell(4).SetCellValue(dataarray[i - 1].帳戶號碼);
+                ws.GetRow(i).CreateCell(5).SetCellValue(dataarray[i - 1].客戶資料.客戶名稱);
+            }
+            var file = new FileStream(@"d:\客戶銀行資訊.xlsx", FileMode.Create);
+            wb.Write(file);
+            file.Close();
+            return RedirectToAction("Index");
         }
     }
 }

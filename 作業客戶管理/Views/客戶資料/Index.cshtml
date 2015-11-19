@@ -9,7 +9,7 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-@using (Html.BeginForm())
+@using (Html.BeginForm("Index","客戶資料"))
 {
     @Html.AntiForgeryToken()
     <div class="row">
@@ -22,17 +22,44 @@
             @Html.EnumDropDownListFor(a => a.客戶分類, "全部")
         </div>
         <input type="submit" name="submit" value="搜尋" class="text-right" />
+        <a href="@Url.Action("ExcelFile", "客戶資料")" role="button" class="btn btn-group-sm">匯出成Excel</a>
     </div>
 }
 <table class="table">
     <tr>
-        <th>客戶分類</th>
-        <th>客戶名稱</th>
-        <th>統一編號</th>
-        <th>電話</th>
-        <th>傳真</th>
-        <th>地址</th>
-        <th>Email</th>
+        <th>
+            客戶分類
+        </th>
+        <th>
+            客戶名稱
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 1, tableNameNum = 1,search = Model.Search , classnum = Model.客戶分類 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 2, tableNameNum = 1,search = Model.Search , classnum = Model.客戶分類  })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+        </th>
+        <th>
+            統一編號
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 1, tableNameNum = 2,search = Model.Search , classnum = Model.客戶分類 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 2, tableNameNum = 2,search = Model.Search , classnum = Model.客戶分類  })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+        </th>
+        <th>
+            電話
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 1, tableNameNum = 3,search = Model.Search , classnum = Model.客戶分類 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 2, tableNameNum = 3,search = Model.Search , classnum = Model.客戶分類  })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+        </th>
+        <th>
+            傳真
+            <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 1, tableNameNum = 4,search = Model.Search , classnum = Model.客戶分類 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+            <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 2, tableNameNum = 4,search = Model.Search , classnum = Model.客戶分類  })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+        </th>
+        <th>
+            地址
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 1, tableNameNum = 5,search = Model.Search , classnum = Model.客戶分類 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 2, tableNameNum = 5,search = Model.Search , classnum = Model.客戶分類  })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+        </th>
+        <th>
+            Email
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 1, tableNameNum = 6,search = Model.Search , classnum = Model.客戶分類 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+            <a href="@Url.Action("OrderBy","客戶資料", new { i = 2, tableNameNum = 6,search = Model.Search , classnum = Model.客戶分類  })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+        </th>
         <th>功能列表</th>
     </tr>
 

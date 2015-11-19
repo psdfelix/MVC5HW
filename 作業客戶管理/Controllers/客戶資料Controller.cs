@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
-using System.Collections.Generic;
-using System.Data.Entity;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using 作業客戶管理.Models;
+using 作業客戶管理.Models.Enum;
 using 作業客戶管理.Models.ViewModel;
 
 namespace 作業客戶管理.Controllers
@@ -139,6 +143,44 @@ namespace 作業客戶管理.Controllers
                 customerData.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult Orderby(int i, int tableNameNum, string search, Enum客戶分類? classnum)
+        {
+            var data = customerData.OrderBy(i, tableNameNum, search, classnum);
+            return View("Index", data);
+        }
+
+        public ActionResult ExcelFile()
+        {
+            IWorkbook wb = new XSSFWorkbook();
+            ISheet ws;
+            ws = wb.CreateSheet("客戶資料表");
+            var data = customerData.All().Where(p => p.IsDelete != true).ToList();
+            var dataarray = data.ToArray();
+
+            ws.CreateRow(0).CreateCell(0).SetCellValue("客戶分類");
+            ws.GetRow(0).CreateCell(1).SetCellValue("客戶名稱");
+            ws.GetRow(0).CreateCell(2).SetCellValue("統一編號");
+            ws.GetRow(0).CreateCell(3).SetCellValue("電話");
+            ws.GetRow(0).CreateCell(4).SetCellValue("傳真");
+            ws.GetRow(0).CreateCell(5).SetCellValue("地址");
+            ws.GetRow(0).CreateCell(6).SetCellValue("Email");
+
+            for (int i = 1; i <= dataarray.Length; i++)
+            {
+                ws.CreateRow(i).CreateCell(0).SetCellValue(dataarray[i - 1].客戶分類.Value);
+                ws.GetRow(i).CreateCell(1).SetCellValue(dataarray[i-1].客戶名稱);
+                ws.GetRow(i).CreateCell(2).SetCellValue(dataarray[i-1].統一編號);
+                ws.GetRow(i).CreateCell(3).SetCellValue(dataarray[i-1].電話);
+                ws.GetRow(i).CreateCell(4).SetCellValue(dataarray[i-1].傳真);
+                ws.GetRow(i).CreateCell(5).SetCellValue(dataarray[i-1].地址);
+                ws.GetRow(i).CreateCell(6).SetCellValue(dataarray[i-1].Email);
+            }
+            var file = new FileStream(@"d:\客戶分類.xlsx", FileMode.Create);
+            wb.Write(file);
+            file.Close();
+            return RedirectToAction("Index");
         }
     }
 }

@@ -17,6 +17,7 @@
             @Html.EditorFor(p => p.BankName)
         </div>
         <input type="submit" name="submit" value="搜尋" class="text-right" />
+        <a href="@Url.Action("ExcelFile", "客戶銀行資訊")" role="button" class="btn btn-group-sm">匯出成Excel</a>
     </div>
 }
 <table class="table">

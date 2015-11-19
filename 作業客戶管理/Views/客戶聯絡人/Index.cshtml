@@ -9,7 +9,7 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-@using (Html.BeginForm())
+@using (Html.BeginForm("Index", "客戶聯絡人"))
 {
     @Html.AntiForgeryToken()
     <div class="row">
@@ -22,17 +22,42 @@
             @Html.EditorFor(p => p.Name)
         </div>
         <input type="submit" name="submit" value="搜尋" class="text-right" />
+        <a href="@Url.Action("ExcelFile", "客戶聯絡人")" role="button" class="btn btn-group-sm">匯出成Excel</a>
     </div>
 }
 @using (Html.BeginForm("EditList", "客戶聯絡人", FormMethod.Post))
 {
     <table class="table">
         <tr>
-            <th>職稱</th>
-            <th>姓名</th>
-            <th>Email</th>
-            <th>手機</th>
-            <th>電話</th>
+            <th>
+                職稱
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 1, tableNameNum = 1,name = Model.Name , job = Model.職稱 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 2, tableNameNum = 1,name = Model.Name , job = Model.職稱  })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+            </th>
+            <th>
+                姓名
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 1, tableNameNum = 2,name = Model.Name , job = Model.職稱  })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 2, tableNameNum = 2,name = Model.Name , job = Model.職稱  })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+
+            </th>
+            <th>
+                Email
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 1, tableNameNum = 3,name = Model.Name , job = Model.職稱  })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 2, tableNameNum = 3 ,name = Model.Name , job = Model.職稱 })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+
+            </th>
+            <th>
+                手機
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 1, tableNameNum = 4 ,name = Model.Name , job = Model.職稱 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 2, tableNameNum = 4 ,name = Model.Name , job = Model.職稱 })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+
+            </th>
+            <th>
+                電話
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 1, tableNameNum = 5 ,name = Model.Name , job = Model.職稱 })"><i class="glyphicon glyphicon-chevron-up"></i></a>
+                <a href="@Url.Action("OrderBy","客戶聯絡人", new { i = 2, tableNameNum = 5 ,name = Model.Name , job = Model.職稱 })"><i class="glyphicon glyphicon-chevron-down"></i></a>
+
+            </th>
             <th>客戶名稱</th>
             <th>功能列表</th>
         </tr>
@@ -47,7 +72,7 @@
                 <td>
                     @Html.HiddenFor(modelItem => data[i].Id)
                     @Html.HiddenFor(modelItem => data[i].客戶Id)
-                    @Html.EditorFor(modelItem => data[i].職稱 , new { htmlAttributes = new {Name = "data[" + i + "].職稱" } })
+                    @Html.EditorFor(modelItem => data[i].職稱, new { htmlAttributes = new { Name = "data[" + i + "].職稱" } })
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => data[i].姓名)
@@ -73,6 +98,4 @@
         }
     </table>
     <button type="submit" value="批次更新">批次更新</button>
-}
-
-
+            }

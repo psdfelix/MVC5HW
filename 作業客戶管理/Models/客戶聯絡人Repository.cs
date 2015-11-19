@@ -51,6 +51,74 @@ namespace 作業客戶管理.Models
                 UnitOfWork.Commit();
             }
         }
+
+        public 客戶聯絡人SearchViewModel OrderBy(int i, int tableNameNum, string name, string job)
+        {
+            var data = All().Where(p => p.IsDelete != true);
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                data = data.Where(p => p.姓名.Contains(name));
+            }
+
+            if (!string.IsNullOrEmpty(job))
+            {
+                data = data.Where(p => p.職稱.Contains(job));
+            }
+
+            if (i == 1)
+            {
+                switch (tableNameNum)
+                {
+                    case 1:
+                        data = data.OrderBy(p => p.職稱);
+                        break;
+                    case 2:
+                        data = data.OrderBy(p => p.姓名);
+                        break;
+                    case 3:
+                        data = data.OrderBy(p => p.Email);
+                        break;
+                    case 4:
+                        data = data.OrderBy(p => p.手機);
+                        break;
+                    case 5:
+                        data = data.OrderBy(p => p.電話);
+                        break;
+                }
+            }
+            else
+            {
+                switch (tableNameNum)
+                {
+                    case 1:
+                        data = data.OrderByDescending(p => p.職稱);
+                        break;
+                    case 2:
+                        data = data.OrderByDescending(p => p.姓名);
+                        break;
+                    case 3:
+                        data = data.OrderByDescending(p => p.Email);
+                        break;
+                    case 4:
+                        data = data.OrderByDescending(p => p.手機);
+                        break;
+                    case 5:
+                        data = data.OrderByDescending(p => p.電話);
+                        break;
+                }
+            }
+
+            var result = data.ToList();
+            客戶聯絡人SearchViewModel 客戶聯絡人SVM = new 客戶聯絡人SearchViewModel()
+            {
+                Name = name,
+                職稱 = job
+            };
+            客戶聯絡人SVM.客戶聯絡人列表 = result;
+            return 客戶聯絡人SVM;
+
+        }
     }
 
     public  interface I客戶聯絡人Repository : IRepository<客戶聯絡人>
