@@ -1,19 +1,17 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
+using 作業客戶管理.ActionFilter;
 using 作業客戶管理.Models;
 using 作業客戶管理.Models.ViewModel.客戶銀行資訊VM;
 
 namespace 作業客戶管理.Controllers
 {
+    [MyFilterAttribute]
     public class 客戶銀行資訊Controller : Controller
     {
         private 客戶資料Entities db = new 客戶資料Entities();

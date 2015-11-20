@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
+using 作業客戶管理.ActionFilter;
 using 作業客戶管理.Models;
 
 namespace 作業客戶管理.Controllers
 {
+    [MyFilterAttribute]
     public class HomeController : Controller
     {
         private 客戶資料Entities db = new 客戶資料Entities();

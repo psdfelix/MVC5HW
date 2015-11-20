@@ -1,18 +1,18 @@
 ﻿using AutoMapper;
-using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using 作業客戶管理.ActionFilter;
 using 作業客戶管理.Models;
 using 作業客戶管理.Models.Enum;
 using 作業客戶管理.Models.ViewModel;
 
 namespace 作業客戶管理.Controllers
 {
+    [MyFilterAttribute]
     public class 客戶資料Controller : Controller
     {
         private readonly 客戶資料Repository customerData;
